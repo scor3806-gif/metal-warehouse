@@ -1,0 +1,12 @@
+{
+  "name": "metal-warehouse",
+  "version": "1.0.0",
+  "description": "Склад металла на распродажу",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
