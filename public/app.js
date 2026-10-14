@@ -40,7 +40,13 @@ function renderTable() {
                onchange="updateQuantity('${item.id}', this.value)"
                onfocus="this.select()">
       </td>
-      <td class="px-3 py-3 text-gray-600 text-sm">${escapeHtml(item.comment || '')}</td>
+      <td class="px-3 py-3">
+        <input type="text" 
+               value="${escapeHtml(item.comment || '')}" 
+               class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+               onchange="updateComment('${item.id}', this.value)"
+               placeholder="—">
+      </td>
       <td class="px-3 py-3 text-center">
         <button onclick="deleteItem('${item.id}')" 
                 class="text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition"
@@ -71,6 +77,26 @@ async function updateQuantity(id, newQty) {
   } catch (e) {
     console.error(e);
     alert('Не удалось сохранить количество');
+    loadItems();
+  }
+}
+
+// Обновление комментария
+async function updateComment(id, newComment) {
+  try {
+    const res = await fetch(`/api/items/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comment: newComment })
+    });
+
+    if (!res.ok) throw new Error('Ошибка сохранения');
+
+    const item = items.find(i => i.id === id);
+    if (item) item.comment = newComment;
+  } catch (e) {
+    console.error(e);
+    alert('Не удалось сохранить комментарий');
     loadItems();
   }
 }
