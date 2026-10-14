@@ -1,22 +1,22 @@
 [
   {
-    "id": "example-1",
-    "type": "Круг бронзовый",
-    "grade": "Браж 9-4",
-    "size1": "25мм",
-    "size2": "50мм",
-    "quantity": 30,
-    "comment": "пример",
-    "updatedAt": "2026-10-14T07:00:00.000Z"
-  },
-  {
     "id": "example-2",
     "type": "Круг бронзовый",
     "grade": "Браж 9-4",
     "size1": "50мм",
     "size2": "50мм",
     "quantity": 50,
-    "comment": "Привет",
-    "updatedAt": "2026-10-14T13:33:53.732Z"
+    "comment": "",
+    "updatedAt": "2026-10-14T07:00:00.000Z"
+  },
+  {
+    "id": "mv85oj3fq0w6fk2",
+    "type": "Круг бронзовый",
+    "grade": "Браж 9-4",
+    "size1": "25мм",
+    "size2": "100мм",
+    "quantity": 30,
+    "comment": "пример",
+    "updatedAt": "2026-10-14T13:38:54.507Z"
   }
 ]

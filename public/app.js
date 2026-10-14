@@ -47,7 +47,12 @@ function renderTable() {
           ${item.comment ? escapeHtml(item.comment) : '<span class="text-gray-400">—</span>'}
         </div>
       </td>
-      <td class="px-3 py-3 text-center">
+      <td class="px-3 py-3 text-center whitespace-nowrap">
+        <button onclick="copyItem('${item.id}')" 
+                class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded transition"
+                title="Копировать">
+          ⧉
+        </button>
         <button onclick="deleteItem('${item.id}')" 
                 class="text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition"
                 title="Удалить">
@@ -269,6 +274,21 @@ async function uploadBackup(event) {
   }
 
   event.target.value = '';
+}
+
+// Копировать позицию
+function copyItem(id) {
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+
+  document.getElementById('type').value = item.type || '';
+  document.getElementById('grade').value = item.grade || '';
+  document.getElementById('size1').value = item.size1 || '';
+  document.getElementById('size2').value = item.size2 || '';
+  document.getElementById('quantity').value = item.quantity || 0;
+  document.getElementById('comment').value = item.comment || '';
+
+  openAddModal();
 }
 
 // Модалка
