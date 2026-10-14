@@ -33,10 +33,21 @@
         <h1 class="text-xl sm:text-2xl font-bold">Склад металла</h1>
         <p class="text-slate-300 text-sm">Только позиции на распродажу</p>
       </div>
-      <button onclick="openAddModal()" 
-              class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center justify-center gap-2">
-        <span class="text-xl leading-none">+</span> Добавить позицию
-      </button>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="downloadBackup()" 
+                class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2.5 rounded-lg font-medium transition text-sm">
+          Скачать бэкап
+        </button>
+        <button onclick="document.getElementById('backupFile').click()" 
+                class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2.5 rounded-lg font-medium transition text-sm">
+          Загрузить бэкап
+        </button>
+        <input type="file" id="backupFile" accept=".json" class="hidden" onchange="uploadBackup(event)">
+        <button onclick="openAddModal()" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center justify-center gap-2">
+          <span class="text-xl leading-none">+</span> Добавить
+        </button>
+      </div>
     </div>
   </header>
 
@@ -83,12 +94,10 @@
             </tr>
           </thead>
           <tbody id="itemsTable" class="divide-y divide-gray-200 text-sm">
-            <!-- Строки будут добавляться через JS -->
           </tbody>
         </table>
       </div>
 
-      <!-- Пустое состояние -->
       <div id="emptyState" class="hidden py-16 text-center text-gray-500">
         <p class="text-lg">Позиций не найдено</p>
         <p class="mt-2">Попробуйте изменить фильтры или добавьте новую позицию</p>

@@ -153,6 +153,61 @@ function clearFilters() {
   filterItems();
 }
 
+// ===== БЭКАП =====
+
+// Скачать бэкап
+function downloadBackup() {
+  const dataStr = JSON.stringify(items, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `metal-backup-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Загрузить бэкап
+async function uploadBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!confirm('Загрузить бэкап? Текущие данные будут полностью заменены!')) {
+    event.target.value = '';
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    if (!Array.isArray(data)) {
+      alert('Неверный формат файла бэкапа');
+      return;
+    }
+
+    const res = await fetch('/api/restore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) throw new Error('Ошибка восстановления');
+
+    alert('Бэкап успешно загружен!');
+    await loadItems();
+  } catch (e) {
+    console.error(e);
+    alert('Не удалось загрузить бэкап. Проверьте файл.');
+  }
+
+  event.target.value = '';
+}
+
 // Модалка
 function openAddModal() {
   document.getElementById('addModal').classList.remove('hidden');
@@ -165,12 +220,10 @@ function closeAddModal() {
   document.getElementById('addModal').classList.remove('flex');
 }
 
-// Закрытие модалки по клику вне
 document.getElementById('addModal').addEventListener('click', (e) => {
   if (e.target.id === 'addModal') closeAddModal();
 });
 
-// Экранирование HTML
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;

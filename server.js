@@ -98,6 +98,40 @@ const server = http.createServer((req, res) => {
     }
   }
 
+  // Восстановление из бэкапа
+  if (pathname === '/api/restore' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        if (!Array.isArray(data)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Ожидается массив' }));
+          return;
+        }
+        // Простая валидация
+        const clean = data.map(item => ({
+          id: item.id || generateId(),
+          type: String(item.type || '').trim(),
+          grade: String(item.grade || '').trim(),
+          size1: String(item.size1 || '').trim(),
+          size2: String(item.size2 || '').trim(),
+          quantity: Number(item.quantity) || 0,
+          comment: String(item.comment || '').trim(),
+          updatedAt: item.updatedAt || new Date().toISOString()
+        }));
+        writeData(clean);
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: true, count: clean.length }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Неверный JSON' }));
+      }
+    });
+    return;
+  }
+
   const itemMatch = pathname.match(/^\/api\/items\/([^/]+)$/);
   if (itemMatch) {
     const id = itemMatch[1];
