@@ -40,12 +40,12 @@ function renderTable() {
                onchange="updateQuantity('${item.id}', this.value)"
                onfocus="this.select()">
       </td>
-      <td class="px-3 py-3">
-        <input type="text" 
-               value="${escapeHtml(item.comment || '')}" 
-               class="w-full px-2 py-1.5 border border-gray-200 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-               onchange="updateComment('${item.id}', this.value)"
-               placeholder="—">
+      <td class="px-3 py-3 max-w-[200px]">
+        <div class="comment-cell cursor-pointer text-sm text-gray-700 hover:bg-blue-50 px-2 py-1 rounded min-h-[32px] flex items-center"
+             onclick="startEditComment(this, '${item.id}')"
+             title="Нажмите, чтобы редактировать">
+          ${item.comment ? escapeHtml(item.comment) : '<span class="text-gray-400">—</span>'}
+        </div>
       </td>
       <td class="px-3 py-3 text-center">
         <button onclick="deleteItem('${item.id}')" 
@@ -81,24 +81,61 @@ async function updateQuantity(id, newQty) {
   }
 }
 
-// Обновление комментария
-async function updateComment(id, newComment) {
-  try {
-    const res = await fetch(`/api/items/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ comment: newComment })
-    });
+// Начать редактирование комментария
+function startEditComment(el, id) {
+  if (el.querySelector('input')) return; // уже редактируется
 
-    if (!res.ok) throw new Error('Ошибка сохранения');
+  const item = items.find(i => i.id === id);
+  const current = item ? (item.comment || '') : '';
 
-    const item = items.find(i => i.id === id);
-    if (item) item.comment = newComment;
-  } catch (e) {
-    console.error(e);
-    alert('Не удалось сохранить комментарий');
-    loadItems();
-  }
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = current;
+  input.className = 'w-full px-2 py-1.5 border border-blue-400 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+  input.placeholder = 'Комментарий...';
+
+  el.innerHTML = '';
+  el.appendChild(input);
+  input.focus();
+  input.select();
+
+  const save = async () => {
+    const newComment = input.value.trim();
+    el.onclick = null; // временно
+
+    try {
+      const res = await fetch(`/api/items/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment: newComment })
+      });
+      if (!res.ok) throw new Error('Ошибка');
+
+      const it = items.find(i => i.id === id);
+      if (it) it.comment = newComment;
+
+      el.innerHTML = newComment ? escapeHtml(newComment) : '<span class="text-gray-400">—</span>';
+    } catch (e) {
+      console.error(e);
+      alert('Не удалось сохранить комментарий');
+      el.innerHTML = current ? escapeHtml(current) : '<span class="text-gray-400">—</span>';
+    }
+
+    // вернуть возможность клика
+    el.onclick = () => startEditComment(el, id);
+  };
+
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.blur();
+    }
+    if (e.key === 'Escape') {
+      el.innerHTML = current ? escapeHtml(current) : '<span class="text-gray-400">—</span>';
+      el.onclick = () => startEditComment(el, id);
+    }
+  });
 }
 
 // Добавление
